@@ -97,15 +97,72 @@
 // 	.appendChild(myCell.getElement());
 
 
-//krok trzeci
+// //krok trzeci
+// //klasa widoku 1
+// class Component {
+// 	getElement() {
+// 		return this._element;
+// 	}
+// }
+// //klasa widoku 2
+// class CellComponent extends Component {
+// 	constructor({handleCellClick, location}){ 
+// 		super();
+// 		this._state = 'unknown';
+// 		this._element= document.createElement('td');
+// 		this._element.addEventListener('click', function () {
+// 			handleCellClick({ location});
+// 		});
+// 		this._refresh();
+// 	}
+
+// 	setState(stateName) {
+// 		this._state= stateName;
+// 		this._refresh(); //wywolanie fu//
+// 	}
+// 	_refresh(){
+// 		this._element.textContent = this._state;
+// 		this._element.className = 'cell_' + this._state;
+
+// 	}
+// }
+
+
+
+// class GameController { 
+// 	constructor(cell){
+// 		this._cell = cell;
+// 	}
+// 	handleCellClick({location}) {
+// 		this._cell[location].setState('miss');
+// 	}
+// }
+
+// let myController;
+// function handleCellClick(...args) {
+// 	myController.handleCellClick.apply(myController, args);
+// }
+// const cells = [
+// new CellComponent({handleCellClick, location:0}),
+// new CellComponent({handleCellClick, location:1})
+// ]
+
+// const myCell = new CellComponent({handleCellClick, location: 0});
+
+// myController = new GameController(cells)
+// const cellContainer = document.getElementById('cellCointainer')
+// 	cellContainer.appendChild(cells[0].getElement());
+// 	cellContainer.appendChild(cells[1].getElement());
+
+//krok czwarty
 //klasa widoku 1
-class Component {
+class Component { //przypisalismy metode getelement do componentu
 	getElement() {
 		return this._element;
 	}
 }
 //klasa widoku 2
-class CellComponent extends Component {
+class CellComponent extends Component { //renderuje kolumny i wiersze
 	constructor({handleCellClick, location}){ 
 		super();
 		this._state = 'unknown';
@@ -116,11 +173,11 @@ class CellComponent extends Component {
 		this._refresh();
 	}
 
-	setState(stateName) {
+	setState(stateName) { //ustawia stan
 		this._state= stateName;
 		this._refresh(); //wywolanie fu//
 	}
-	_refresh(){
+	_refresh(){ //odświeża treść wpisów
 		this._element.textContent = this._state;
 		this._element.className = 'cell_' + this._state;
 
@@ -128,13 +185,39 @@ class CellComponent extends Component {
 }
 
 
+class BoardComponent extends Component {
+	constructor({ handleCellClick, size = 8 }) {
+		super();
+		this._element = document.createElement('table');
+		this._cells = {};
+		for (let rowNumber = 0; rowNumber < size; rowNumber += 1) {
+			const rowElement = document.createElement('tr');
+			for (let columnNumber = 0; columnNumber < size; columnNumber += 1) {
+				const cell = new CellComponent({
+					handleCellClick,
+					location: { row: rowNumber, column: columnNumber }
+				});
+				rowElement.appendChild(cell.getElement());
+				// Also save a reference to the cell so that it can be addressed later
+				this._cells[`${rowNumber}X${columnNumber}`] = cell;
+			}
+			this._element. appendChild(rowElement);
+		}
+	}
+
+	setCellState(location, state) {
+		const key = `${location.row}X${location.column}`;
+		this._cells[key].setState(state); // odwołuje się do wlaściwej pozycji i wywołuje funkcje setState
+	}
+}
+
 
 class GameController { 
-	constructor(cell){
-		this._cell = cell;
+	constructor(board){
+		this._board = board;
 	}
 	handleCellClick({location}) {
-		this._cell[location].setState('miss');
+		this._board.setCellState(location, 'miss');
 	}
 }
 
@@ -142,17 +225,7 @@ let myController;
 function handleCellClick(...args) {
 	myController.handleCellClick.apply(myController, args);
 }
-const cells = [
-new CellComponent({handleCellClick, location:0}),
-new CellComponent({handleCellClick, location:1})
-]
+const board = new BoardComponent({ handleCellClick })
+myController = new GameController(board);
 
-const myCell = new CellComponent({handleCellClick, location: 0});
-
-myController = new GameController(cells)
-const cellContainer = document.getElementById('cellCointainer')
-	cellContainer.appendChild(cells[0].getElement());
-	cellContainer.appendChild(cells[1].getElement());
-
-
-
+const boardContainer = document.getElementById('boardContainer').appendChild(board.getElement())
