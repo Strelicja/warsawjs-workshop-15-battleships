@@ -296,7 +296,7 @@ class GameController {
 		this._model = model;
 	}
 	handleCellClick({location}) {
-		this._model.firedAt(location);
+		this._model.fireAt(location);
 	}
 }
 
@@ -312,11 +312,14 @@ class CellModel {
 			return undefined;
 		}
 		this._firedAt = true;
+		console.log('dziala')
 		return (this._hasShip ? 'hit' : 'miss');
+
 	}
+
 }
 class BoardModel {
-	constructor({size = 8} = {}) {
+	constructor({size = 8} = {}) { //{}tworzymy nowy obiekt ktory odszukuje wyzej size
 		this._cells = {};
 		for (let i = 0; i < size; i++) {
 			for (let j = 0; j < size; j++) {
@@ -324,10 +327,10 @@ class BoardModel {
 			}
 		}
 	}
-	firedAt(location) {
+	fireAt(location) {
 		const target = this._cells[`${location.row}x${location.column}`];
 		const firingResult = target.fire();
-		console.log(firingResult)
+		
 	}
 }
 
