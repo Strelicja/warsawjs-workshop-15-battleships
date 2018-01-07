@@ -45,7 +45,59 @@
 // 	.getElementById('cellCointainer')
 // 	.appendChild(myCell.getElement());
 
-//krok drugi
+// //krok drugi
+// //klasa widoku 1
+// class Component {
+// 	getElement() {
+// 		return this._element;
+// 	}
+// }
+// //klasa widoku 2
+// class CellComponent extends Component {
+// 	constructor(handleCellClick){ //stworzyc kontroler, przekazac go do cell i go odpalic
+// 		super();
+// 		this._state = 'unknown';
+// 		this._element= document.createElement('td');
+// 		this._element.addEventListener('click', function () {
+// 			handleCellClick();
+// 		});
+// 		this._refresh();
+// 	}
+
+// 	setState(stateName) {
+// 		this._state= stateName;
+// 		this._refresh(); //wywolanie fu//
+// 	}
+// 	_refresh(){
+// 		this._element.textContent = this._state;
+// 		this._element.className = 'cell_' + this._state;
+
+// 	}
+// }
+
+
+
+// class GameController { 
+// 	constructor(cell){
+// 		this._cell = cell;
+// 	}
+// 	handleCellClick() {
+// 		this._cell.setState('miss');
+// 	}
+// }
+
+// let myController;
+// function handleCellClick() {
+// 	myController.handleCellClick();
+// }
+// const myCell = new CellComponent(handleCellClick);
+// myController = new GameController(myCell)
+// document
+// 	.getElementById('cellCointainer')
+// 	.appendChild(myCell.getElement());
+
+
+//krok trzeci
 //klasa widoku 1
 class Component {
 	getElement() {
@@ -54,12 +106,12 @@ class Component {
 }
 //klasa widoku 2
 class CellComponent extends Component {
-	constructor(handleCellClick){ //stworzyc kontroler, przekazac go do cell i go odpalic
+	constructor({handleCellClick, location}){ 
 		super();
 		this._state = 'unknown';
 		this._element= document.createElement('td');
 		this._element.addEventListener('click', function () {
-			handleCellClick();
+			handleCellClick({ location});
 		});
 		this._refresh();
 	}
@@ -77,21 +129,22 @@ class CellComponent extends Component {
 
 
 
-class GameController {
+class GameController { 
 	constructor(cell){
 		this._cell = cell;
 	}
-	handleCellClick() {
-		this._cell.setState('miss');
+	handleCellClick({location}) {
+		this._cell[location].setState('miss');
 	}
 }
 
 let myController;
-function handleCellClick() {
-	myController.handleCellClick();
+function handleCellClick(...args) {
+	myController.handleCellClick.apply(myController, args);
 }
-const myCell = new CellComponent(handleCellClick);
-myController = new GameController(myCell)
+const myCell = new CellComponent({handleCellClick, location: 0});
+const cells = [myCell];
+myController = new GameController(cells)
 document
 	.getElementById('cellCointainer')
 	.appendChild(myCell.getElement());
