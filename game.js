@@ -302,9 +302,10 @@ class GameController {
 
 
 class CellModel {
-	constructor({ _hasShip }) {
-		this._hasShip = _hasShip;
+	constructor({ hasShip }) {
+		this._hasShip = hasShip;
 		this._firedAt = false;
+		// this._addObserver = 
 	}
 	fire() {
 		//Gaurd clause - jesli parametry sa złe to robi coś innego, nie dwa razy w to samo miejsce
@@ -323,14 +324,36 @@ class BoardModel {
 		this._cells = {};
 		for (let i = 0; i < size; i++) {
 			for (let j = 0; j < size; j++) {
-				this._cells[`${i}x${j}`] = new CellModel({ _hasShip: false})
+				let hasShip;
+				if(Math.random() <0.2) {
+					hasShip = true;
+				}
+				else {
+					hasShip = false;
+				}
+				this._cells[`${i}x${j}`] = new CellModel({ hasShip: hasShip});
 			}
 		}
+		this._observers = {}; //mapa kluczy, doklejamy do listy kolejne wydarzenia, array pusty
+
 	}
 	fireAt(location) {
 		const target = this._cells[`${location.row}x${location.column}`];
 		const firingResult = target.fire();
-		
+		this._notifyObservers('firedAt', {location, firingResult});
+	}
+	_notifyObservers(type, data) {
+//runall saved observers for given type
+	(this._observers[type] || []).forEach(function(observer){
+		observer(data);
+	})
+	}
+	addObserver(type, oberverFunction) {
+//save the sobserve fun for running later
+	if(!this._observers[type]){
+		this._observers[type] = [];
+	}
+	this._observers[type].push(oberverFunction);
 	}
 }
 
@@ -341,5 +364,7 @@ function handleCellClick(...args) {
 const boardView = new BoardComponent({ handleCellClick });
 const boardModel = new BoardModel();
 myController = new GameController(boardModel);
-
+boardModel.addObserver('firedAt',function({ location, firingResult}){
+	boardView.setCellState(location,firingResult);
+})
 const boardContainer = document.getElementById('boardContainer').appendChild(boardView.getElement());
