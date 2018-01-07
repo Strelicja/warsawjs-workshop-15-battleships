@@ -142,12 +142,17 @@ let myController;
 function handleCellClick(...args) {
 	myController.handleCellClick.apply(myController, args);
 }
+const cells = [
+new CellComponent({handleCellClick, location:0}),
+new CellComponent({handleCellClick, location:1})
+]
+
 const myCell = new CellComponent({handleCellClick, location: 0});
-const cells = [myCell];
+
 myController = new GameController(cells)
-document
-	.getElementById('cellCointainer')
-	.appendChild(myCell.getElement());
+const cellContainer = document.getElementById('cellCointainer')
+	cellContainer.appendChild(cells[0].getElement());
+	cellContainer.appendChild(cells[1].getElement());
 
 
 
